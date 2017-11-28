@@ -5,15 +5,76 @@
     <title>Hello World!</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+  <div id="app">
+    <el-container>
+      <el-header>
+        <!--<el-row>
+          <el-col :span="24">
+            <el-form-item label="活动名称">
+              <el-input style="display: inline-block;width:600px" v-model="inputdir" placeholder="源目录"></el-input>
+               <el-button style="display: inline-block" size="small" type="primary">选取文件</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-col :span="24">
+              <el-input style="display: inline-block;width:600px" v-model="outdir" placeholder="源目录"></el-input> <el-button style="display: inline-block" size="small" type="primary">选取文件</el-button>
+            </el-col>
+          </el-col>
+        </el-row>-->
+        <el-form :label-position="'left'" label-width="80px" :model="formLabelAlign" @submit.native.prevent>
+          <el-form-item label="源目录">
+            <el-input style="display: inline-block;width:600px" v-model="formLabelAlign.inputdir" placeholder="源目录"></el-input>
+            <el-button style="display: inline-block" size="small" type="primary" @click="openInputDialog">选择</el-button>
+          </el-form-item>
+          <el-form-item label="目标目录">
+            <el-input style="display: inline-block;width:600px" v-model="formLabelAlign.outputdir" placeholder="目标目录"></el-input>
+            <el-button style="display: inline-block" size="small" type="primary">选择</el-button>
+          </el-form-item>
+        </el-form>
+
+      </el-header>
+      <el-main>
+        <div id="wapper" @dblclick="saveImg">
+          <cropper
+                  v-show="img!==null"
+                  ref="cropper"
+                  :img="img"
+                  :outputSize="size"
+                  :outputType="outputType"
+                  :info="info"
+                  :auto-crop="false"
+                  :auto-crop-width="autoCropWidth"
+                  :auto-crop-height="autoCropHeight"
+                  :fixed="fixed"
+                  :fixed-number="fixedNumber"
+          ></cropper>
+        </div>
+      </el-main>
+      <el-footer>
+        <div id="scroll-wapper" ref="scroll">
+          <ul class="content">
+                  <li  v-for="(item,index) in fileList"
+                       @click="selectImg(item,index)":class="{selected:index==selectIndex}">
+                    <img  :src="item.src" />
+                  </li>
+          </ul>
+        </div>
+        <!--<img style="width:200px" src="C:\Users\zjp\Pictures\22.png" />-->
+      </el-footer>
+    </el-container>
+
+
+  </div>
 
     <script>
       // You can also require other files to run in this process
       require('./renderer.js')
     </script>
+  <link href="main.css" rel="stylesheet" type="text/css"/>
+<!--  <style type="text/css">
+    @import "./node_modules/vue-croppa/dist/vue-croppa.css";
+  </style>-->
   </body>
 </html>
