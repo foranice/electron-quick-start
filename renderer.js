@@ -13,6 +13,7 @@ const vm=new Vue({
     el:'#app',
     data: {
         img:null,
+        cropperimg:null,
         formLabelAlign: {
             inputdir: '',
             outputdir: path.resolve('./output'),
@@ -28,7 +29,7 @@ const vm=new Vue({
         autoCropHeight: 75,
         // 开启宽度和高度比例
         fixed: true,
-        fixedNumber: [4, 3],
+        fixedNumber: [1, 2],
         msg:'asd',
         scroll:null,
         selectIndex:0,
@@ -79,10 +80,8 @@ const vm=new Vue({
                     fs.writeFileSync(distpath,buffer)
                     vm.fileListInfo[vm.selectIndex].dist=distpath
                     vm.fileListInfo[vm.selectIndex].edited=true
-                    if(vm.selectIndex!=vm.fileListInfo.length-1){
-                        vm.selectIndex++
-                        vm.img=vm.fileListInfo[vm.selectIndex].src
-                    }
+
+                   vm.cropperimg=distpath
                     vm.clearCrop()
 
                 });
@@ -105,6 +104,34 @@ const vm=new Vue({
            if(e.key=='Escape'){
                this.clearCrop()
            }
+           else if(e.key=='ArrowRight'){
+                if(vm.selectIndex!=vm.fileListInfo.length-1){
+                        vm.selectIndex++
+                        vm.img=vm.fileListInfo[vm.selectIndex].src
+                        vm.cropperimg=null
+                    }
+                    vm.$nextTick(()=>{
+                        console.log(vm.scroll.x)
+                        console.log(document.querySelector('#scroll-wapper .selected').offsetLeft)
+                        if(document.querySelector('#scroll-wapper .selected').offsetLeft>1000&&((-vm.scroll.x)<document.querySelector('.content').offsetWidth-960))
+                        vm.scroll.scrollBy(-100,0)
+                    })
+
+           }
+           else if(e.key=='ArrowLeft'){
+               if(vm.selectIndex!=0){
+                   vm.selectIndex--
+                   vm.img=vm.fileListInfo[vm.selectIndex].src
+                   vm.cropperimg=null
+               }
+               vm.$nextTick(()=>{
+                   console.log(vm.scroll.x)
+                   if(document.querySelector('#scroll-wapper .selected').offsetLeft<100&&(vm.scroll.x<0))
+                       vm.scroll.scrollBy(100,0)
+               })
+           }
+
+
 
         }
     },

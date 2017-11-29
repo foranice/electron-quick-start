@@ -30,26 +30,29 @@
           </el-form-item>
           <el-form-item label="目标目录">
             <el-input style="display: inline-block;width:600px" v-model="formLabelAlign.outputdir" placeholder="目标目录"></el-input>
-            <el-button style="display: inline-block" size="small" type="primary">选择</el-button>
+            <el-button style="display: inline-block" size="small" type="primary" @click="openOutputDialog">选择</el-button>
           </el-form-item>
         </el-form>
 
       </el-header>
       <el-main>
-        <div id="wapper" @dblclick="saveImg">
-          <cropper
-                  v-show="img!==null"
-                  ref="cropper"
-                  :img="img"
-                  :outputSize="size"
-                  :outputType="outputType"
-                  :info="info"
-                  :auto-crop="false"
-                  :auto-crop-width="autoCropWidth"
-                  :auto-crop-height="autoCropHeight"
-                  :fixed="fixed"
-                  :fixed-number="fixedNumber"
-          ></cropper>
+        <div id="main">
+          <div id="wapper" @dblclick="saveImg">
+            <cropper
+                    v-show="img!==null"
+                    ref="cropper"
+                    :img="img"
+                    :output-size="size"
+                    :output-type="outputType"
+                    :info="info"
+                    :auto-crop="false"
+                    :auto-crop-width="autoCropWidth"
+                    :auto-crop-height="autoCropHeight"
+                    :fixed="fixed"
+                    :fixed-number="fixedNumber"
+            ></cropper>
+        </div>
+          <img :src="cropperimg" id="cropper-img">
         </div>
       </el-main>
       <el-footer>

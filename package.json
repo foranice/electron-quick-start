@@ -4,7 +4,8 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack-win": "electron-packager . exampleFilter --overwrite  --download.mirror=https://npm.taobao.org/mirrors/electron/ --out=out  --platform=win32 --arch=ia32 --app-copyright='copyright © 北京美秒科技有限公司' --version-string.CompanyName='北京美秒科技有限公司' --version-string.OriginalFilename='截图工具' --version-string.FileDescription='截图工具' --version-string.ProductName='截图工具' --no-prune  --electron-version=1.6.2"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -17,13 +18,13 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "~1.7.8"
+    "electron": "~1.7.8",
+    "electron-packager": "^8.4.0"
   },
   "dependencies": {
     "better-scroll": "^1.5.1",
     "element-ui": "^2.0.5",
     "vue": "^2.5.9",
-    "vue-croppa": "^1.1.3",
     "vue-cropper": "^0.2.6"
   }
 }
