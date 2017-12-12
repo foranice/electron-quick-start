@@ -83,19 +83,24 @@ const vm=new Vue({
             console.log(this.screenROI())
             console.log(this.trueROI())
             this.$refs.cropper.getCropBlob((data) => {
-                var reader = new FileReader();
-                reader.addEventListener("loadend", function() {
-                    let buffer=Buffer.from(reader.result)
-                    let srcpath=path.parse(vm.fileListInfo[vm.selectIndex].src)
-                    let distpath=path.resolve(vm.formLabelAlign.outputdir,`${srcpath.name}-${Math.round(vm.trueROI().startX)}-${Math.round(vm.trueROI().startY)}-${vm.trueROI().width}-${vm.trueROI().height}${srcpath.ext}`)
-                    fs.writeFileSync(distpath,buffer)
-                    fs.appendFileSync(path.resolve(vm.formLabelAlign.outputdir,'log.txt'), `${new Date().getTime()} ${srcpath.base} ${Math.round(vm.trueROI().startX)
-                    } ${Math.round(vm.trueROI().startY)} ${vm.trueROI().width} ${vm.trueROI().height} ${path.parse(distpath).base}`)
-                    vm.fileListInfo[vm.selectIndex].dist=distpath
-                    vm.fileListInfo[vm.selectIndex].edited=true
-                   vm.cropperimg=distpath
-                    vm.clearCrop()
-
+                let reader = new FileReader()
+                reader.addEventListener("loadend", ()=> {
+                    let image = new Image()
+                        image.onload=()=>{
+                        let width = image.width
+                        let height = image.height
+                            let buffer=Buffer.from(reader.result)
+                            let srcpath=path.parse(vm.fileListInfo[vm.selectIndex].src)
+                            let distpath=path.resolve(vm.formLabelAlign.outputdir,`${srcpath.name}_${Math.round(vm.trueROI().startX)}_${Math.round(vm.trueROI().startY)}_${width}_${height}${srcpath.ext}`)
+                            fs.writeFileSync(distpath,buffer)
+                            /* fs.appendFileSync(path.resolve(vm.formLabelAlign.outputdir,'log.txt'), `${new Date().getTime()} ${srcpath.base} ${Math.round(vm.trueROI().startX)
+                             } ${Math.round(vm.trueROI().startY)} ${vm.trueROI().width} ${vm.trueROI().height} ${path.parse(distpath).base}`)*/
+                            vm.fileListInfo[vm.selectIndex].dist=distpath
+                            vm.fileListInfo[vm.selectIndex].edited=true
+                            vm.cropperimg=distpath
+                            vm.clearCrop()
+                    };
+                    image.src= window.URL.createObjectURL(data);
                 });
                 reader.readAsArrayBuffer(data);
             })
@@ -169,6 +174,14 @@ const vm=new Vue({
                 }
             }
 
+        },
+        scale:function () {
+            if(this.$refs.cropper){
+                return this.$refs.cropper.scale
+            }
+            else{
+                return 0
+            }
         }
     },
     mounted:function () {
@@ -207,6 +220,7 @@ const vm=new Vue({
 
     },
     computed:{
+
         fileList:function () {
             let res
             try{

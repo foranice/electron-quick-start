@@ -36,6 +36,8 @@
           <el-form-item label="目标目录">
             <el-input style="display: inline-block;width:600px" v-model="formLabelAlign.outputdir" placeholder="目标目录"></el-input>
             <el-button style="display: inline-block" size="small" type="primary" @click="openOutputDialog">选择</el-button>
+            <span style="margin-left: 20px">图像缩放比：</span>
+            <span style="margin-left: 10px">{{scale().toFixed(2)}}</span>
           </el-form-item>
         </el-form>
 
@@ -54,6 +56,7 @@
                     :auto-crop-width="autoCropWidth"
                     :auto-crop-height="autoCropHeight"
                     :fixed="fixed"
+                    :full="true"
                     :fixed-number="fixedNumber"
             ></cropper>
         </div>

@@ -11,7 +11,7 @@ let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1280, height: 960,titleBarStyle :'hidden'})
+  mainWindow = new BrowserWindow({width: 1280, height: 960,titleBarStyle :'hidden',resizable:false})
   mainWindow.setMenu(null)
   mainWindow.setTitle('截图工具')
   //mainWindow.webContents.openDevTools()
@@ -24,7 +24,7 @@ function createWindow () {
     if(!fs.existsSync('./output')){
         fs.mkdirSync('./output')
     }
-  // mainWindow.webContents.openDevTools()
+   //mainWindow.webContents.openDevTools()
   mainWindow.on('closed', function () {
     mainWindow = null
   })
