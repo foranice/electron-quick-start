@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "pack-win": "electron-packager . exampleFilter --overwrite  --download.mirror=https://npm.taobao.org/mirrors/electron/ --out=out  --platform=win32 --arch=ia32 --app-copyright='copyright © 北京美秒科技有限公司' --version-string.CompanyName='北京美秒科技有限公司' --version-string.OriginalFilename='截图工具' --version-string.FileDescription='截图工具' --version-string.ProductName='截图工具' --no-prune  --electron-version=1.6.2"
+    "pack-win": "electron-packager . exampleFilter --overwrite  --download.mirror=https://npm.taobao.org/mirrors/electron/ --out=out  --platform=win32 --arch=ia32 --app-copyright='copyright © ' --version-string.CompanyName='' --version-string.OriginalFilename='截图工具' --version-string.FileDescription='截图工具' --version-string.ProductName='截图工具' --no-prune  --electron-version=1.6.2"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [

@@ -18,6 +18,8 @@ const vm=new Vue({
             inputdir: '',
             outputdir: path.resolve('./output'),
         },
+        fixedW:1,
+        fixedH:2,
         enablecrop:false,
         info: true,
         size: 1,
@@ -29,11 +31,15 @@ const vm=new Vue({
         autoCropHeight: 75,
         // 开启宽度和高度比例
         fixed: true,
-        fixedNumber: [1, 2],
         msg:'asd',
         scroll:null,
         selectIndex:0,
-        fileListInfo:{}
+        fileListInfo:{},
+        status:0,
+        cropWidth:0,
+        cropHeight:0,
+        currentPage:1,
+        filePage:[],
     },
     components: {
         // <my-component> 将只在父组件模板中可用
@@ -43,13 +49,13 @@ const vm=new Vue({
         startCrop () {
             // start
             //this.crap = true
-
-            this.$refs.cropper.startCrop()
+            this.status=1;
+           // this.$refs.cropper.startCrop()
         },
         stopCrop () {
             //  stop
             //this.crap = false
-            this.$refs.cropper.stopCrop()
+            //this.$refs.cropper.stopCrop()
         },
         clearCrop () {
             // clear
@@ -60,6 +66,7 @@ const vm=new Vue({
                 properties  :["openDirectory"]
             },(res)=>{
                 this.formLabelAlign.inputdir=res?res[0]:[]
+                this.handleCurrentChange(1)
             })
         },
         openOutputDialog(){
@@ -70,17 +77,22 @@ const vm=new Vue({
             })
         },
         saveImg(){
-           // alert(111)
+            this.status=2;
+            this.cropWidth=Math.round(this.$refs.cropper.cropW)
+            this.cropHeight=Math.round(this.$refs.cropper.cropH)
+            console.log(this.screenROI())
+            console.log(this.trueROI())
             this.$refs.cropper.getCropBlob((data) => {
                 var reader = new FileReader();
                 reader.addEventListener("loadend", function() {
                     let buffer=Buffer.from(reader.result)
                     let srcpath=path.parse(vm.fileListInfo[vm.selectIndex].src)
-                    let distpath=path.resolve(vm.formLabelAlign.outputdir,(new Date().getTime()).toString()+srcpath.ext)
+                    let distpath=path.resolve(vm.formLabelAlign.outputdir,`${srcpath.name}-${Math.round(vm.trueROI().startX)}-${Math.round(vm.trueROI().startY)}-${vm.trueROI().width}-${vm.trueROI().height}${srcpath.ext}`)
                     fs.writeFileSync(distpath,buffer)
+                    fs.appendFileSync(path.resolve(vm.formLabelAlign.outputdir,'log.txt'), `${new Date().getTime()} ${srcpath.base} ${Math.round(vm.trueROI().startX)
+                    } ${Math.round(vm.trueROI().startY)} ${vm.trueROI().width} ${vm.trueROI().height} ${path.parse(distpath).base}`)
                     vm.fileListInfo[vm.selectIndex].dist=distpath
                     vm.fileListInfo[vm.selectIndex].edited=true
-
                    vm.cropperimg=distpath
                     vm.clearCrop()
 
@@ -89,51 +101,110 @@ const vm=new Vue({
             })
         },
         selectImg(path,index){
+            this.status=0;
             this.img=path.src
             this.selectIndex=index
+        },
+        imgOffset:function () {
+            let node =document.querySelector('.cropper-box-canvas')
+            return {
+                x:(640-node.clientWidth*this.$refs.cropper.scale)/2,
+                y:(480-node.clientHeight*this.$refs.cropper.scale)/2
+            }
+        },
+        handleCurrentChange:function (currentPage) {
+            this.filePage=this.fileList.splice((currentPage-1)*10,10)
+        },
+        screenROI:function () {
+            try{
+                if(this.status==0){
+                    return {
+                        startX:0,
+                        startY:0,
+                        width:0,
+                        height:0
+                    }
+                }
+                if(this.status==2){
+                    return {
+                        startX:Math.round((this.$refs.cropper.cropOffsertX-this.imgOffset().x)*100)/100,
+                        startY:Math.round((this.$refs.cropper.cropOffsertY-this.imgOffset().y)*100)/100,
+                        width:this.cropWidth,
+                        height:this.cropHeight
+                    }
+                }
+                return {
+                    startX:Math.round((this.$refs.cropper.cropOffsertX-this.imgOffset().x)*100)/100,
+                    startY:Math.round((this.$refs.cropper.cropOffsertY-this.imgOffset().y)*100)/100,
+                    width:Math.round(this.$refs.cropper.cropW*100)/100,
+                    height:Math.round(this.$refs.cropper.cropH*100)/100
+                }
+            }
+            catch(err){
+                console.log(err)
+                return {
+                    startX:0,
+                    startY:0,
+                    width:0,
+                    height:0
+                }
+            }
+        },
+        trueROI:function () {
+            try{
+                return {
+                    startX:Math.round(this.screenROI().startX/this.$refs.cropper.scale*100)/100,
+                    startY:Math.round(this.screenROI().startY/this.$refs.cropper.scale*100)/100,
+                    width:Math.round(this.screenROI().width/this.$refs.cropper.scale*100)/100,
+                    height:Math.round(this.screenROI().height/this.$refs.cropper.scale*100)/100,
+                }
+
+            }
+            catch(err){
+                return {
+                    startX:0,
+                    startY:0,
+                    width:0,
+                    height:0
+                }
+            }
+
         }
     },
     mounted:function () {
         this.$refs.cropper.move=false
-        this.scroll = new BScroll(this.$refs.scroll,{
-            scrollY: false,
-            scrollX:true,
-            click: true
-        })
         document.onkeydown = (e)=>{
+            console.log(e.key)
            if(e.key=='Escape'){
                this.clearCrop()
+               this.status=0;
            }
            else if(e.key=='ArrowRight'){
                 if(vm.selectIndex!=vm.fileListInfo.length-1){
                         vm.selectIndex++
-                        vm.img=vm.fileListInfo[vm.selectIndex].src
+                        vm.img=vm.fileListInfo[vm.selectIndex]?vm.fileListInfo[vm.selectIndex].src:null
                         vm.cropperimg=null
                     }
-                    vm.$nextTick(()=>{
-                        console.log(vm.scroll.x)
-                        console.log(document.querySelector('#scroll-wapper .selected').offsetLeft)
-                        if(document.querySelector('#scroll-wapper .selected').offsetLeft>1000&&((-vm.scroll.x)<document.querySelector('.content').offsetWidth-960))
-                        vm.scroll.scrollBy(-100,0)
-                    })
 
            }
            else if(e.key=='ArrowLeft'){
                if(vm.selectIndex!=0){
                    vm.selectIndex--
-                   vm.img=vm.fileListInfo[vm.selectIndex].src
+                   vm.img=vm.fileListInfo[vm.selectIndex]?vm.fileListInfo[vm.selectIndex].src:null
                    vm.cropperimg=null
                }
-               vm.$nextTick(()=>{
-                   console.log(vm.scroll.x)
-                   if(document.querySelector('#scroll-wapper .selected').offsetLeft<100&&(vm.scroll.x<0))
-                       vm.scroll.scrollBy(100,0)
-               })
+           }
+           else if(e.key=='PageUp'){
+                if(this.currentPage>1) this.currentPage--
+           }
+           else if(e.key=='PageDown'){
+                if(this.currentPage<this.maxPage) this.currentPage++
            }
 
 
 
         }
+
     },
     computed:{
         fileList:function () {
@@ -159,6 +230,13 @@ const vm=new Vue({
                 this.img=filelist[0]
             }
             return this.fileListInfo
+        },
+        fixedNumber:function () {
+            return [this.fixedW,this.fixedH]
+        },
+        maxPage:function () {
+            return Math.ceil(this.fileList.length/10)
         }
+
     }
 })

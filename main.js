@@ -14,7 +14,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({width: 1280, height: 960,titleBarStyle :'hidden'})
   mainWindow.setMenu(null)
   mainWindow.setTitle('截图工具')
-  // and load the index.html of the app.
+  //mainWindow.webContents.openDevTools()
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',

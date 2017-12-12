@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>截图工具 V1.0.2 powered by lab</title>
   </head>
   <body>
   <div id="app">
@@ -27,6 +27,11 @@
           <el-form-item label="源目录">
             <el-input style="display: inline-block;width:600px" v-model="formLabelAlign.inputdir" placeholder="源目录"></el-input>
             <el-button style="display: inline-block" size="small" type="primary" @click="openInputDialog">选择</el-button>
+            <span style="margin-left: 20px">截图框比例(W:H)</span>
+            <el-input-number v-model="fixedW"  :min="1" :max="20" label="描述文字"></el-input-number>
+            <span>:</span>
+            <el-input-number v-model="fixedH"  :min="1" :max="20" label="描述文字"></el-input-number>
+          </el-form-item>
           </el-form-item>
           <el-form-item label="目标目录">
             <el-input style="display: inline-block;width:600px" v-model="formLabelAlign.outputdir" placeholder="目标目录"></el-input>
@@ -37,7 +42,7 @@
       </el-header>
       <el-main>
         <div id="main">
-          <div id="wapper" @dblclick="saveImg">
+          <div id="wapper" @mousedown="startCrop" @dblclick="saveImg">
             <cropper
                     v-show="img!==null"
                     ref="cropper"
@@ -56,14 +61,37 @@
         </div>
       </el-main>
       <el-footer>
-       <!-- <div id="scroll-wapper" ref="scroll">
+        <div style="margin-left: 20px" >
+          <el-row  class="status-bar" :gutter="22">
+            <el-col :span="2" style="color:deepskyblue">屏幕ROI</el-col>
+            <el-col :span="5"><span>startX:</span>{{screenROI().startX}}</el-col>
+            <el-col :span="5"><span>startY:</span>{{screenROI().startY}}</el-col>
+            <el-col :span="5"><span>width:</span>{{screenROI().width}}</el-col>
+            <el-col :span="5"><span>height:</span>{{screenROI().height}}</el-col>
+          </el-row>
+          <el-row class="status-bar" :gutter="22">
+            <el-col :span="2" style="color:deepskyblue">真实roi</el-col>
+            <el-col :span="5"><span>startX:</span>{{trueROI().startX}}</el-col>
+            <el-col :span="5"><span>startY:</span>{{trueROI().startY}}</el-col>
+            <el-col :span="5"><span>width:</span>{{trueROI().width}}</el-col>
+            <el-col :span="5"><span>height:</span>{{trueROI().height}}</el-col>
+          </el-row>
+        </div>
           <ul class="content">
-                  <li  v-for="(item,index) in fileList"
+                  <li  v-for="(item,index) in filePage"
                        @click="selectImg(item,index)":class="{selected:index==selectIndex}">
                     <img  :src="item.src" />
                   </li>
           </ul>
-        </div>-->
+        <div class="page " v-show="fileList.length>0">
+          <el-pagination
+                  @current-change="handleCurrentChange"
+                  :current-page.sync="currentPage"
+                  :page-size="10"
+                  layout="prev, pager, next, jumper"
+                  :total="fileList.length">
+          </el-pagination>
+        </div>
         <!--<img style="width:200px" src="C:\Users\zjp\Pictures\22.png" />-->
       </el-footer>
     </el-container>
