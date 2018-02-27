@@ -11,10 +11,10 @@ let mainWindow
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1280, height: 960,titleBarStyle :'hidden',resizable:false})
+  mainWindow = new BrowserWindow({width: 1280, height: 960,titleBarStyle :'hidden',resizable:true})
   mainWindow.setMenu(null)
   mainWindow.setTitle('截图工具')
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',

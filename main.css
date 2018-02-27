@@ -69,3 +69,6 @@ footer li.selected{
 .el-header,.el-main{
     margin: 0 !important;
 }
+.el-form-item{
+    margin-bottom:0px !important;
+}
